@@ -1,5 +1,5 @@
-# CCN23-Tutorial
-This repository is for the CCN23 Keynote + Tutorial "Behind the Eyes: Insights into Cognition from Naturalistic Gaze Behavior in VR". It contains the data, the vrGazeCore toolbox, and additional code needed for the tutorial. 
+# SNAPI Analysis
+This repository is for the CCN23 Tutorial and subsequent SNAPI Analysis using VRgazeCore. It contains the data, the vrGazeCore toolbox, and additional code needed for the tutorial. 
 
 You can access the Google Colab notebook associated with the tutorial [here](https://colab.research.google.com/drive/1pKCzE57WHw9_ybZ5oLv5wek48QLzcxPw?usp=sharing). 
 
