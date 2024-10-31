@@ -1,0 +1,80 @@
+import os
+import glob
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
+import streamlit as st
+
+# Constants for DK2 headset
+DK2_RESOLUTION = (960, 1080)  # Per eye resolution in pixels
+FOV_X = 90  # Horizontal field of view in degrees
+FOV_Y = 100  # Vertical field of view in degrees
+
+# Base directory for participant data
+file_path = '/Users/f007kmv/Dartmouth College Dropbox/Benjamin Chamberlain Zivsak/Projects/SNAPI_BenVrGazeCore/SNAPI-Analysis/SNAPI-Analysis/rawDataNew_modified'
+participant_files = glob.glob(os.path.join(file_path, '*.txt'))
+participants = [os.path.splitext(os.path.basename(f))[0] for f in participant_files]
+
+# Streamlit UI for participant selection and center radius adjustment
+st.title("Eye Position Fixations on DK2 Headset Screen")
+participant_id = st.selectbox("Select Participant", participants)
+center_radius_deg = st.slider("Center Radius (°)", min_value=1.0, max_value=20.0, value=10.0, step=0.5)
+
+def load_and_process_data(participant_id):
+    """Load and process fixation data for a given participant."""
+    file = os.path.join(file_path, f"{participant_id}.txt")
+    data = pd.read_csv(file, delimiter=',', header=None)
+    data.columns = ['trial', 'date', 'core_time', 'exp_time', 'pitch', 'yaw', 'roll',
+                    'right_x', 'right_y', 'left_x', 'left_y', 'right_conf', 'left_conf']
+    
+    # Calculate average eye position in normalized coordinates (0-1 range)
+    data['eye_x'] = data[['right_x', 'left_x']].mean(axis=1)
+    data['eye_y'] = data[['right_y', 'left_y']].mean(axis=1)
+    
+    # Scale to pixel coordinates
+    data['pixel_x'] = data['eye_x'] * DK2_RESOLUTION[0]
+    data['pixel_y'] = data['eye_y'] * DK2_RESOLUTION[1]
+    
+    return data
+
+def plot_fixations(data, center_radius_deg):
+    """Plot fixations for the selected participant and center radius."""
+    # Calculate center radius in pixels
+    center_radius_pixels_x = DK2_RESOLUTION[0] * (center_radius_deg / FOV_X)
+    
+    # Plot fixation positions in DK2 pixel space
+    fig, ax = plt.subplots(figsize=(8, 8))
+    ax.scatter(data['pixel_x'], data['pixel_y'], s=5, color='purple', alpha=0.5, label='Fixations')
+    ax.set_xlabel("Horizontal Position (pixels)")
+    ax.set_ylabel("Vertical Position (pixels)")
+    ax.invert_yaxis()  # Match the screen coordinate orientation
+
+    # Add a central circle for DK2 headset center
+    center_x, center_y = DK2_RESOLUTION[0] / 2, DK2_RESOLUTION[1] / 2
+    center_circle = Circle((center_x, center_y), center_radius_pixels_x, color='red', alpha=0.3, label=f"Center ({center_radius_deg}° radius)")
+    ax.add_patch(center_circle)
+    ax.set_xlim(0, DK2_RESOLUTION[0])
+    ax.set_ylim(0, DK2_RESOLUTION[1])
+    ax.legend()
+    ax.set_title(f"Eye Position Fixations on DK2 Headset Screen for {participant_id}")
+
+    # Calculate proportion of fixations inside center circle
+    distances = np.sqrt((data['pixel_x'] - center_x) ** 2 + (data['pixel_y'] - center_y) ** 2)
+    inside_circle = distances <= center_radius_pixels_x
+    inside_ratio = np.sum(inside_circle) / len(distances) if len(distances) > 0 else 0
+    outside_ratio = 1 - inside_ratio
+
+    st.pyplot(fig)  # Display the plot in Streamlit
+
+    # Plot histogram for proportions
+    fig2, ax2 = plt.subplots(figsize=(5, 5))
+    ax2.bar(["Inside Center", "Outside Center"], [inside_ratio, outside_ratio], color=['green', 'blue'])
+    ax2.set_ylabel("Proportion of Fixations")
+    ax2.set_title("Fixation Proportion Inside and Outside Center")
+    
+    st.pyplot(fig2)  # Display the histogram
+
+# Load and plot data based on the selected participant and radius
+data = load_and_process_data(participant_id)
+plot_fixations(data, center_radius_deg)
