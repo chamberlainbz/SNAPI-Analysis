@@ -1,5 +1,5 @@
 # SNAPI Analysis
-This repository is for the CCN23 Tutorial and subsequent SNAPI Analysis using VRgazeCore. It contains the data, the vrGazeCore toolbox, and additional code needed for the tutorial. 
+This repository is for the CCN23 Tutorial and subsequent SNAPI Analysis using VRgazeCore. It contains the data, the vrGazeCore toolbox, and additional code needed for the tutorial and additional GazeCenter Analysis.
 
 You can access the Google Colab notebook associated with the tutorial [here](https://colab.research.google.com/drive/1pKCzE57WHw9_ybZ5oLv5wek48QLzcxPw?usp=sharing). 
 
