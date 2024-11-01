@@ -6,15 +6,15 @@ import os
 import numpy as np
 import tempfile
 
-# Constants for DK2 headset
+# constants for DK2 headset
 DK2_RESOLUTION = (960, 1080)  # Per eye resolution in pixels
 FOV_X = 90  # Horizontal field of view in degrees
 FOV_Y = 100  # Vertical field of view in degrees
 
-# Directory with participant data
+# directory with participant data
 default_directory = '/Users/f007kmv/Dartmouth College Dropbox/Benjamin Chamberlain Zivsak/Projects/SNAPI_BenVrGazeCore/SNAPI-Analysis/SNAPI-Analysis/rawDataNew_modified'
 
-# Define the app UI with organized layout and extra spacing
+# define the app UI with organized layout and extra spacing
 app_ui = ui.page_fluid(
     ui.panel_title("Eye Center Visualization"),
     ui.input_select("participant_id", "Select Participant:", choices=[]),
@@ -51,7 +51,7 @@ def server(input: Inputs, output: Outputs, session):
     
     load_participant_list()
 
-    # Load and process data function
+    # load and process data function
     def load_and_process_data(filepath):
         data = pd.read_csv(filepath, delimiter=',', header=None)
         data.columns = ['trial', 'date', 'core_time', 'exp_time', 'pitch', 'yaw', 'roll',
@@ -82,7 +82,7 @@ def server(input: Inputs, output: Outputs, session):
         
         return load_and_process_data(filepath)
 
-    # Plot fixation positions
+    # plot fixation positions. shiny use
     @output
     @render.plot
     def fixation_plot():
